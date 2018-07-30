@@ -5,7 +5,7 @@ import { Checkbox, Alert, Icon } from 'antd';
 import Login from 'components/Login';
 import styles from './Login.less';
 
-const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
+const { Tab, UserName, Password, Submit } = Login;
 
 @connect(({ login, loading }) => ({
   login,
@@ -13,23 +13,18 @@ const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 }))
 export default class LoginPage extends Component {
   state = {
-    type: 'account',
     autoLogin: true,
   };
 
-  onTabChange = type => {
-    this.setState({ type });
-  };
-
   handleSubmit = (err, values) => {
-    const { type } = this.state;
     const { dispatch } = this.props;
+    const { autoLogin } = this.state;
     if (!err) {
       dispatch({
         type: 'login/login',
         payload: {
           ...values,
-          type,
+          rememberMe: autoLogin,
         },
       });
     }
@@ -41,31 +36,15 @@ export default class LoginPage extends Component {
     });
   };
 
-  renderMessage = content => {
-    return <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />;
-  };
-
   render() {
-    const { login, submitting } = this.props;
-    const { type, autoLogin } = this.state;
+    const { submitting } = this.props;
+    const { autoLogin } = this.state;
     return (
       <div className={styles.main}>
-        <Login defaultActiveKey={type} onTabChange={this.onTabChange} onSubmit={this.handleSubmit}>
+        <Login defaultActiveKey="account" onTabChange={this.onTabChange} onSubmit={this.handleSubmit}>
           <Tab key="account" tab="账户密码登录">
-            {login.status === 'error' &&
-              login.type === 'account' &&
-              !submitting &&
-              this.renderMessage('账户或密码错误（admin/888888）')}
-            <UserName name="userName" placeholder="admin/user" />
-            <Password name="password" placeholder="888888/123456" />
-          </Tab>
-          <Tab key="mobile" tab="手机号登录">
-            {login.status === 'error' &&
-              login.type === 'mobile' &&
-              !submitting &&
-              this.renderMessage('验证码错误')}
-            <Mobile name="mobile" />
-            <Captcha name="captcha" />
+            <UserName name="username" placeholder="请输入手机号码" />
+            <Password name="password" placeholder="请输入密码" />
           </Tab>
           <div>
             <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>

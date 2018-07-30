@@ -13,7 +13,7 @@ const map = {
     rules: [
       {
         required: true,
-        message: 'Please enter username!',
+        message: '请输入手机号码!',
       },
     ],
   },
@@ -28,7 +28,7 @@ const map = {
     rules: [
       {
         required: true,
-        message: 'Please enter password!',
+        message: '请输入密码',
       },
     ],
   },
