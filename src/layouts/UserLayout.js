@@ -34,7 +34,7 @@ const copyright = (
 function getLoginPathWithRedirectPath() {
   const params = getPageQuery();
   const { redirect } = params;
-  return getQueryPath('/user/login', {
+  return getQueryPath('/user/s/login', {
     redirect,
   });
 }

@@ -70,14 +70,11 @@ export default class GlobalHeader extends PureComponent {
     } = this.props;
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
-        <Menu.Item disabled>
+        <Menu.Item key="userInfo">
           <Icon type="user" />个人中心
         </Menu.Item>
-        <Menu.Item disabled>
+        <Menu.Item key="setting">
           <Icon type="setting" />设置
-        </Menu.Item>
-        <Menu.Item key="triggerError">
-          <Icon type="close-circle" />触发报错
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item key="logout">
@@ -123,7 +120,7 @@ export default class GlobalHeader extends PureComponent {
           </Tooltip>
           <NoticeIcon
             className={styles.action}
-            count={currentUser.notifyCount}
+            count={0}
             onItemClick={(item, tabProps) => {
               console.log(item, tabProps); // eslint-disable-line
             }}
@@ -151,11 +148,11 @@ export default class GlobalHeader extends PureComponent {
               emptyImage="https://gw.alipayobjects.com/zos/rmsportal/HsIsxMZiWKrNUavQUXqx.svg"
             />
           </NoticeIcon>
-          {currentUser.name ? (
+          {currentUser.nickname ? (
             <Dropdown overlay={menu}>
               <span className={`${styles.action} ${styles.account}`}>
                 <Avatar size="small" className={styles.avatar} src={currentUser.avatar} />
-                <span className={styles.name}>{currentUser.name}</span>
+                <span className={styles.name}>{currentUser.nickname}</span>
               </span>
             </Dropdown>
           ) : (

@@ -1,3 +1,4 @@
+
 export function getLoginUser() {
   const userPrincipalStr = localStorage.getItem('csqx-user');
   if (userPrincipalStr) {

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Layout, Icon, message } from 'antd';
+import { Layout, Icon, message, Modal } from 'antd';
 import DocumentTitle from 'react-document-title';
 import { connect } from 'dva';
 import { Route, Redirect, Switch, routerRedux } from 'dva/router';
@@ -16,6 +16,8 @@ import { getRoutes } from '../utils/utils';
 import Authorized from '../utils/Authorized';
 import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
+import { getLoginUser } from '../utils/global';
+import AccountSettings from '../routes/User/AccountSettings';
 
 const { Content, Header, Footer } = Layout;
 const { AuthorizedRoute, check } = Authorized;
@@ -96,6 +98,8 @@ class BasicLayout extends React.PureComponent {
 
   state = {
     isMobile,
+    currentUser: {},
+    modalVisible: false,
   };
 
   getChildContext() {
@@ -112,10 +116,14 @@ class BasicLayout extends React.PureComponent {
         isMobile: mobile,
       });
     });
+
+    const currentUser = getLoginUser();
     const { dispatch } = this.props;
-    dispatch({
-      type: 'user/fetchCurrent',
-    });
+    if (currentUser == null) {
+      dispatch(routerRedux.push('/user/s/login'));
+    } else {
+      this.setState({ currentUser });
+    }
   }
 
   componentWillUnmount() {
@@ -177,16 +185,22 @@ class BasicLayout extends React.PureComponent {
     });
   };
 
+  handleModalVisible = (flag) => {
+    this.setState({modalVisible: flag});
+  };
+
   handleMenuClick = ({ key }) => {
     const { dispatch } = this.props;
-    if (key === 'triggerError') {
-      dispatch(routerRedux.push('/exception/trigger'));
-      return;
-    }
-    if (key === 'logout') {
-      dispatch({
-        type: 'login/logout',
-      });
+    switch (key) {
+      case "userInfo":
+        // 用户中心
+        this.handleModalVisible(true);
+        break;
+      case "logout":
+        // 注销登录
+        dispatch({type: 'login/logout'});
+        break;
+      default:
     }
   };
 
@@ -201,7 +215,6 @@ class BasicLayout extends React.PureComponent {
 
   render() {
     const {
-      currentUser,
       collapsed,
       fetchingNotices,
       notices,
@@ -209,7 +222,7 @@ class BasicLayout extends React.PureComponent {
       match,
       location,
     } = this.props;
-    const { isMobile: mb } = this.state;
+    const { isMobile: mb, currentUser, modalVisible } = this.state;
     const bashRedirect = this.getBaseRedirect();
     const layout = (
       <Layout>
@@ -288,6 +301,15 @@ class BasicLayout extends React.PureComponent {
               }
             />
           </Footer>
+          <Modal
+            title="账号设置"
+            width={1000}
+            visible={modalVisible}
+            onCancel={()=>this.handleModalVisible(false)}
+            footer={null}
+          >
+            <AccountSettings currentUser={currentUser} fetchCurrent={this.fetchCurrent}  />
+          </Modal>
         </Layout>
       </Layout>
     );
