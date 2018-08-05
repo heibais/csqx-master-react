@@ -24,21 +24,15 @@ class AccountSettings extends React.Component {
   }
 
   onSubmit = () => {
-    const { form, dispatch, currentUser, fetchCurrent} = this.props;
+    const { form, dispatch, currentUser } = this.props;
     form.validateFieldsAndScroll(['avatar', 'nickname'], (err, values) => {
       if (!err) {
         dispatch({
           type: 'account/save',
           payload: Object.assign({}, {id: currentUser.id}, values ),
-          callback: fetchCurrent,
+          callback: this.fetchCurrent,
         })
       }
-    });
-  };
-
-  handleCancel = () => {
-    this.setState({
-      modalVisible: false,
     });
   };
 
@@ -50,7 +44,7 @@ class AccountSettings extends React.Component {
 
   checkPassword = (rule, value, callback) => {
     const { form } = this.props;
-    if (value && value !== form.getFieldValue('password')) {
+    if (value && value !== form.getFieldValue('newPassword')) {
       callback('两次密码输入不一致!');
     } else {
       callback();
@@ -61,7 +55,7 @@ class AccountSettings extends React.Component {
     const { form } = this.props;
     const { confirmDirty } = this.state;
     if (value && confirmDirty) {
-      form.validateFields(['newPassword'], {force: true});
+      form.validateFields(['newPassword2'], {force: true});
     }
     if (value && value === form.getFieldValue('oldPassword')) {
       callback('新密码与旧密码不能一致!');
@@ -72,15 +66,28 @@ class AccountSettings extends React.Component {
 
   onSubmitUpdatePwd = () => {
     const { form, dispatch, currentUser } = this.props;
-   form.validateFieldsAndScroll(['oldPassword', "password"], (err, values) => {
+    form.validateFieldsAndScroll(['oldPassword', "newPassword"], (err, values) => {
       if (!err) {
         dispatch({
-          type: 'users/changePwd',
-          payload: Object.assign({}, values, {userId: currentUser.id}),
+          type: 'account/changePwd',
+          payload: Object.assign({}, values, {id: currentUser.id}),
           callback: this.handleCancel,
         })
       }
     });
+  };
+
+  handleCancel = () => {
+    this.setState({
+      modalVisible: false,
+    });
+  };
+
+  fetchCurrent = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'account/fetchCurrent',
+    })
   };
 
   showModal = (type) => {
@@ -121,7 +128,8 @@ class AccountSettings extends React.Component {
         },
       },
     };
-    const changePwd = <div>
+    const changePwd =
+      <div>
         <Form.Item {...formItemLayout} label="旧密码" hasFeedback >
           {getFieldDecorator('oldPassword', {
             rules: [{
@@ -130,7 +138,7 @@ class AccountSettings extends React.Component {
           })(<Input type="password" />)}
         </Form.Item>
         <Form.Item {...formItemLayout} label="新密码" hasFeedback >
-          {getFieldDecorator('password', {
+          {getFieldDecorator('newPassword', {
             rules: [
               {required: true, message: '输入你的密码!'},
               {type: "string", min: 6, max: 20, message: '长度限制为6至20个之间!'},
@@ -138,7 +146,7 @@ class AccountSettings extends React.Component {
           })(<Input type="password" /> )}
         </Form.Item>
         <Form.Item {...formItemLayout} label="确认密码" hasFeedback>
-          {getFieldDecorator('newPassword', {
+          {getFieldDecorator('newPassword2', {
             rules: [
               {required: true, message: '输入你的确认密码!'},
               {type: "string", min: 6, max: 20, message: '长度限制为6至20个之间!'},
@@ -148,7 +156,7 @@ class AccountSettings extends React.Component {
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" onClick={this.onSubmitUpdatePwd}>确认</Button>
         </Form.Item>
-    </div>;
+      </div>;
 
     const bindMobile = <div>
       <Tabs activeKey={mobileActiveKey} tabBarStyle={{display: 'none'}}>

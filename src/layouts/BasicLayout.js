@@ -308,7 +308,7 @@ class BasicLayout extends React.PureComponent {
             onCancel={()=>this.handleModalVisible(false)}
             footer={null}
           >
-            <AccountSettings currentUser={currentUser} fetchCurrent={this.fetchCurrent}  />
+            <AccountSettings currentUser={currentUser} />
           </Modal>
         </Layout>
       </Layout>

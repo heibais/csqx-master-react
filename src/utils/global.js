@@ -8,7 +8,7 @@ export function getLoginUser() {
 }
 
 export function setLoginUser(user) {
-  localStorage.setItem('csqx-user', user);
+  localStorage.setItem('csqx-user', JSON.stringify(user));
 }
 
 export function getUserId() {

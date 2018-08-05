@@ -7,6 +7,9 @@ const prefix = '/csqx/v1';
 export async function findAccountList(param) {
   return request(`${prefix}/user/account?${stringify(param)}`);
 }
+export async function findAccountCurrent() {
+  return request(`${prefix}/user/account/current`);
+}
 export async function removeAccount(param) {
   return request(`${prefix}/user/account/${param.id}`, { method: 'DELETE' });
 }
@@ -15,6 +18,9 @@ export async function saveAccount(param) {
 }
 export async function changeAccountStatus(param) {
   return request(`${prefix}/user/account/${param.id}/change-status`);
+}
+export async function changeAccountPwd(param) {
+  return request(`${prefix}/user/account/${param.id}/change-pwd`, { method: 'POST', body: param });
 }
 
 /** 登录与注册 */

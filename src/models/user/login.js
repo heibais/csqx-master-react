@@ -20,7 +20,7 @@ export default {
         // 登录成功
         setAuthority("user");
         reloadAuthorized();
-        setLoginUser(JSON.stringify(response.data));
+        setLoginUser(response.data);
         yield put(routerRedux.push('/'))
       } else {
         return message.error(response.msg);
