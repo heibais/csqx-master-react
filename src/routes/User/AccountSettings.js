@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'dva';
 import { Input, Tabs, Icon, Form, Button, Card, Row, Col, Modal } from 'antd';
 import ImgUpload from '../../components/Upload/ImgUpload';
+import CountDown from "../../components/CountDown";
 
 import styles from './AccountSettings.less';
 
@@ -15,12 +16,25 @@ class AccountSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      mobileActiveKey: '1',
+      mobileActiveKey: '2',
+      emailActiveKey: '2',
       confirmDirty: false,
       type: '',
       modalVisible: false,
 
     };
+  }
+
+  componentDidMount() {
+    const { currentUser } = this.props;
+    if (currentUser) {
+      if (currentUser.email) {
+        this.setState({emailActiveKey: '1'});
+      }
+      if (currentUser.mobile) {
+        this.setState({mobileActiveKey: '1'});
+      }
+    }
   }
 
   onSubmit = () => {
@@ -104,7 +118,7 @@ class AccountSettings extends React.Component {
 
   render() {
     const { currentUser, form: { getFieldDecorator } } = this.props;
-    const { mobileActiveKey, type, modalVisible  } = this.state;
+    const { mobileActiveKey, emailActiveKey, type, modalVisible  } = this.state;
 
     const formItemLayout = {
       labelCol: {
@@ -211,12 +225,73 @@ class AccountSettings extends React.Component {
             </Input.Group>
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
-            <Button type="primary" onClick={() => this.prematchCaptcha('orignalMobile', 'orignalCaptcha')}>确认</Button>
+            <Button type="primary" onClick={() => this.onSubmitReset('mobile')}>确认</Button>
           </Form.Item>
         </TabPane>
       </Tabs>
-    </div>
-    const bindEmail = <div></div>
+    </div>;
+
+    const bindEmail = <div>
+      <Tabs activeKey={emailActiveKey} tabBarStyle={{display: 'none'}}>
+        <TabPane tab="Tab 1" key="1">
+          <Form.Item {...formItemLayout} label="原始邮箱">
+            {getFieldDecorator('originEmail', {
+              rules: [
+                {required: true, message: '请输入你的邮箱!'},
+                {type: 'email', message: '邮箱格式错误!'},
+              ],
+            })(<Input />)}
+          </Form.Item>
+          <Form.Item {...formItemLayout} label="验证码">
+            <Input.Group>
+              <Row>
+                <Col span={15}>
+                  {getFieldDecorator('originCaptcha', {
+                    rules: [{required: true, message: '请输入验证码!'}],
+                  })(<Input placeholder="验证码" />)}
+                </Col>
+                <Col span={9}>
+                  <Button type="primary" className="captcha-btn">
+                    获取验证码
+                  </Button>
+                </Col>
+              </Row>
+            </Input.Group>
+          </Form.Item>
+          <Form.Item {...tailFormItemLayout}>
+            <Button type="primary" onClick={() => this.preMatchCaptcha('originEmail', 'originCaptcha')}>下一步</Button>
+          </Form.Item>
+        </TabPane>
+        <TabPane tab="Tab 2" key="2">
+          <Form.Item {...formItemLayout} label="新邮箱">
+            {getFieldDecorator('newEmail', {
+              rules: [
+                {required: true, message: '请输入你的邮箱!'},
+                {type: 'email', message: '邮箱格式错误!'},
+              ],
+            })(<Input />)}
+          </Form.Item>
+          <Form.Item {...formItemLayout} label="验证码">
+              <Row gutter={8}>
+                <Col span={15}>
+                  {getFieldDecorator('newCaptcha', {
+                    rules: [{required: true, message: '请输入验证码!'}],
+                  })(<Input placeholder="验证码" />)}
+                </Col>
+                <Col span={9}>
+                  <Button type="primary" className="captcha-btn">
+                    获取验证码
+                  </Button>
+                </Col>
+              </Row>
+
+          </Form.Item>
+          <Form.Item {...tailFormItemLayout}>
+            <Button type="primary" onClick={() => this.onSubmitReset('email')}>确认</Button>
+          </Form.Item>
+        </TabPane>
+      </Tabs>
+    </div>;
 
     return (
       <div>
@@ -240,7 +315,7 @@ class AccountSettings extends React.Component {
               })(<Input autoComplete="off" />)}
             </Form.Item>
             <Form.Item {...tailFormItemLayout}>
-              <Button  type="primary" onClick={() => this.onSubmit()}>保存</Button>
+              <Button type="primary" onClick={() => this.onSubmit()}>保存</Button>
             </Form.Item>
           </TabPane>
           <TabPane tab={<span><Icon type="lock" />账户安全</span>} key="2">
@@ -256,7 +331,7 @@ class AccountSettings extends React.Component {
                   互联网账号存在被盗风险，建议您定期更改密码以保护账户安全。
                 </Col>
                 <Col span={3} style={{textAlign: 'center'}}>
-                  <a href="javascript:;" onClick={() => this.showModal('pwd')}>修改</a>
+                  <a onClick={() => this.showModal('pwd')}>修改</a>
                 </Col>
               </Row>
               <Row className={styles.rowStyle}>
