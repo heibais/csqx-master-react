@@ -179,7 +179,9 @@ export const getRouterData = app => {
     // },
     // 成员管理
     '/user/account': {
-      component: dynamicWrapper(app, ['user/account'], () => import('../routes/User/Account')),
+      component: dynamicWrapper(app, ['user/account', 'sys/notify'], () =>
+        import('../routes/User/Account')
+      ),
     },
   };
   // Get name from ./menu.js or just set it in the router data.

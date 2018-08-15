@@ -30,3 +30,13 @@ export async function accountLogin(param) {
 export async function accountLogout() {
   return request(`${prefix}/user/s/logout`);
 }
+
+/** 信息发送 */
+export async function sendCaptcha(param) {
+  return request(`${prefix}/sys/msg/captcha?msgType=${param.type}&recipient=${param.recipient}`);
+}
+export async function matchCaptcha(param) {
+  return request(
+    `${prefix}/sys/msg/captcha-match?recipient=${param.recipient}&captcha=${param.captcha}`
+  );
+}

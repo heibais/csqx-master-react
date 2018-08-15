@@ -2,18 +2,22 @@ import React from 'react';
 import { connect } from 'dva';
 import { Input, Tabs, Icon, Form, Button, Card, Row, Col, Modal } from 'antd';
 import ImgUpload from '../../components/Upload/ImgUpload';
+import { getUserId } from '../../utils/global';
 
 import styles from './AccountSettings.less';
 
 const TabPane = Tabs.TabPane;
 
-@connect(({ account }) => ({
+@connect(({ account, notify }) => ({
   account,
+  notify,
 }))
+@Form.create()
 class AccountSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      userId: getUserId(),
       mobileActiveKey: '2',
       emailActiveKey: '2',
       confirmDirty: false,
@@ -127,19 +131,80 @@ class AccountSettings extends React.Component {
 
   // 发送验证码
   sendCaptcha = (field, type) => {
-    const { form } = this.props;
+    const { form, dispatch } = this.props;
     form.validateFields([field], (err, values) => {
       if (!err) {
-        const mobileOrEmail = values[type];
+        const recipient = values[field];
         // 判断发送邮件或短信
-        if (type === 'email') {
-          // 邮件
-        } else {
-          // 短信
-        }
+        dispatch({
+          type: 'notify/captcha',
+          payload: { recipient, type },
+        });
         this.onGetCaptcha();
       }
     });
+  };
+
+  onSubmitReset = type => {
+    const { mobileActiveKey, emailActiveKey } = this.state;
+    const { dispatch, form } = this.props;
+    let arr = [];
+    let key = '1';
+    if (type === 'email') {
+      if (emailActiveKey === '1') {
+        arr = ['originEmail', 'originEmailCaptcha'];
+        key = '1';
+      } else {
+        arr = ['newEmail', 'newEmailCaptcha'];
+        key = '2';
+      }
+    } else {
+      if (mobileActiveKey === '1') {
+        arr = ['originMobile', 'originCaptcha'];
+        key = '1';
+      } else {
+        arr = ['newMobile', 'newCaptcha'];
+        key = '2';
+      }
+    }
+    form.validateFields(arr, (err, values) => {
+      if (!err) {
+        const recipient = values[arr[0]];
+        const captcha = values[arr[1]];
+        // 判断发送邮件或短信
+        dispatch({
+          type: 'notify/captchaMatch',
+          payload: { recipient, captcha },
+          callback: () => this.submitResetCallback(type, key, recipient, dispatch),
+        });
+      }
+    });
+  };
+
+  submitResetCallback = (type, key, recipient, dispatch) => {
+    const { userId } = this.state;
+    if (type === 'email') {
+      if (key === '1') {
+        this.setState({ emailActiveKey: '2' });
+      } else {
+        dispatch({
+          type: 'account/save',
+          payload: { email: recipient, id: userId },
+          callback: this.handleCancel,
+        });
+      }
+    } else {
+      if (key === '1') {
+        this.setState({ mobileActiveKey: '2' });
+      } else {
+        dispatch({
+          type: 'account/save',
+          payload: { mobile: recipient, id: userId },
+          callback: this.handleCancel,
+        });
+      }
+    }
+    this.setState({ count: 0 });
   };
 
   render() {
@@ -290,26 +355,27 @@ class AccountSettings extends React.Component {
               })(<Input />)}
             </Form.Item>
             <Form.Item {...formItemLayout} label="验证码">
-              <Input.Group>
-                <Row>
-                  <Col span={15}>
-                    {getFieldDecorator('originCaptcha', {
-                      rules: [{ required: true, message: '请输入验证码!' }],
-                    })(<Input placeholder="验证码" />)}
-                  </Col>
-                  <Col span={9}>
-                    <Button type="primary" className="captcha-btn">
-                      获取验证码
-                    </Button>
-                  </Col>
-                </Row>
-              </Input.Group>
+              <Row gutter={8}>
+                <Col span={15}>
+                  {getFieldDecorator('originEmailCaptcha', {
+                    rules: [{ required: true, message: '请输入验证码!' }],
+                  })(<Input placeholder="验证码" />)}
+                </Col>
+                <Col span={9}>
+                  <Button
+                    style={{ width: '100%' }}
+                    type="primary"
+                    className="captcha-btn"
+                    disabled={count}
+                    onClick={() => this.sendCaptcha('originEmail', 'EMAIL')}
+                  >
+                    {count ? `${count} s` : '获取验证码'}
+                  </Button>
+                </Col>
+              </Row>
             </Form.Item>
             <Form.Item {...tailFormItemLayout}>
-              <Button
-                type="primary"
-                onClick={() => this.preMatchCaptcha('originEmail', 'originCaptcha')}
-              >
+              <Button type="primary" onClick={() => this.onSubmitReset('email')}>
                 下一步
               </Button>
             </Form.Item>
@@ -326,7 +392,7 @@ class AccountSettings extends React.Component {
             <Form.Item {...formItemLayout} label="验证码">
               <Row gutter={8}>
                 <Col span={15}>
-                  {getFieldDecorator('newCaptcha', {
+                  {getFieldDecorator('newEmailCaptcha', {
                     rules: [{ required: true, message: '请输入验证码!' }],
                   })(<Input placeholder="验证码" />)}
                 </Col>
@@ -336,7 +402,7 @@ class AccountSettings extends React.Component {
                     type="primary"
                     className="captcha-btn"
                     disabled={count}
-                    onClick={() => this.sendCaptcha('newEmail', 'email')}
+                    onClick={() => this.sendCaptcha('newEmail', 'EMAIL')}
                   >
                     {count ? `${count} s` : '获取验证码'}
                   </Button>
@@ -501,4 +567,4 @@ class AccountSettings extends React.Component {
   }
 }
 
-export default Form.create()(AccountSettings);
+export default AccountSettings;
