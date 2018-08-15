@@ -23,6 +23,31 @@ const menuData = [
     ],
   },
   {
+    name: '微信管理',
+    icon: 'wechat',
+    path: 'wx',
+    children: [
+      {
+        name: '基础配置',
+        path: 'base',
+        children: [
+          {
+            name: '公众账号管理',
+            path: 'mp-account',
+          },
+          {
+            name: '自定义菜单',
+            path: 'custom-menu',
+          },
+          {
+            name: '关键字管理',
+            path: 'keyword',
+          },
+        ],
+      },
+    ],
+  },
+  {
     name: '表单页',
     icon: 'form',
     path: 'form',
