@@ -40,3 +40,14 @@ export async function matchCaptcha(param) {
     `${prefix}/sys/msg/captcha-match?recipient=${param.recipient}&captcha=${param.captcha}`
   );
 }
+
+/** 微信 公众号 */
+export async function findWxMpAccountList(param) {
+  return request(`${prefix}/${param.userId}/wxmp/account?${stringify(param)}`);
+}
+export async function removeWxMpAccount(param) {
+  return request(`${prefix}/${param.userId}/wxmp/account/${param.id}`, { method: 'DELETE' });
+}
+export async function saveWxMpAccount(param) {
+  return request(`${prefix}/${param.userId}/wxmp/account`, { method: 'POST', body: param });
+}

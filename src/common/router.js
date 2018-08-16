@@ -91,6 +91,13 @@ export const getRouterData = app => {
       // authority: 'admin',
     },
 
+    // 微信
+    '/wx/base/mp-account': {
+      component: dynamicWrapper(app, ['weixin/base/mpAccount'], () =>
+        import('../routes/Weixin/Base/MpAccount')
+      ),
+    },
+
     '/form/basic-form': {
       component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/BasicForm')),
     },
