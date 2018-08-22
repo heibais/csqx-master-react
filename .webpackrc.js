@@ -29,7 +29,8 @@ export default {
 
   proxy: {
     '/csqx': {
-      target: 'http://localhost:8080/',
+      //target: 'http://localhost:8080/',
+      target: 'http://wx.iamgpj.com/',
       changeOrigin: true,
       pathRewrite: { '^/csqx': '' },
     },

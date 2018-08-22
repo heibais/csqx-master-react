@@ -268,6 +268,16 @@ export default class MpAccount extends React.Component {
                 </RadioGroup>
               )}
             </FormItem>
+            <FormItem label="是否默认" {...formItemLayout}>
+              {getFieldDecorator('selected', {
+                initialValue: true,
+              })(
+                <RadioGroup>
+                  <Radio value={true}>是</Radio>
+                  <Radio value={false}>否</Radio>
+                </RadioGroup>
+              )}
+            </FormItem>
             <FormItem label="描述" {...formItemLayout}>
               {getFieldDecorator('mpDesc', {
                 rules: [{ max: 250, message: '描述长度最大250个字符' }],

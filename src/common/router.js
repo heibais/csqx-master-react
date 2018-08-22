@@ -97,6 +97,11 @@ export const getRouterData = app => {
         import('../routes/Weixin/Base/MpAccount')
       ),
     },
+    '/wx/base/custom-menu': {
+      component: dynamicWrapper(app, ['weixin/base/customMenu'], () =>
+        import('../routes/Weixin/Base/CustomMenu')
+      ),
+    },
 
     '/form/basic-form': {
       component: dynamicWrapper(app, ['form'], () => import('../routes/Forms/BasicForm')),
