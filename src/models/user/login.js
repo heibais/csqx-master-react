@@ -1,9 +1,9 @@
 import { routerRedux } from 'dva/router';
 import { message } from 'antd';
-import { accountLogin, accountLogout } from '../../services/admin';
+import { accountLogin, accountLogout, findEnums } from '../../services/admin';
 import { setAuthority } from '../../utils/authority';
 import { reloadAuthorized } from '../../utils/Authorized';
-import { setLoginUser } from '../../utils/global';
+import { setLoginUser, setEnums, getEnums } from '../../utils/global';
 
 
 export default {
@@ -17,6 +17,14 @@ export default {
     *login({ payload }, { call, put }) {
       const response = yield call(accountLogin, payload);
       if (response.code === 200) {
+        // 查询枚举
+        if (getEnums() == null) {
+          const response2 = yield call(findEnums);
+          if (response2.code === 200) {
+            setEnums(response2.data);
+          }
+        }
+        
         // 登录成功
         setAuthority("user");
         reloadAuthorized();
